@@ -23,41 +23,47 @@ void solve(string filename){
     outfile.open(filename);
     
     int m = 100;
-    float c = 1.0;
-    float dx = 1/m;
-    float beta = 0.8;
+    float dx = 0.01;
+    float dt = 0.01;
+    float beta = 1.0;
     
     float u[m+1];
     float u0[m+1];
-    float uf[m+1];
+    float u1[m+1];
     
-    float dt = beta*dx/c;
-    dt = 0.8*0.01;
-    float T_max = 0.2;
-    int n = int(T_max/dt);
+    
+    float T_max = 2.0;
     
     float x = 0;
+    float t = 0;
         
-    for(int i = 0; i < m; i++){
-        x = i*dx;
-        u0[i] = exp(-300*(x-0.12)*(x-0.12));
-        uf[i] = exp(-300*(x-0.12-c*T_max)*(x-0.12-c*T_max));
+    for(int i = 0; i < 100; i++){
+        u0[i] = 0.05*sin(i*dx*4*M_PI);
+        //u[i] = u0[i];
+        u1[i] = u0[i];
     }
+
     
-    for(int j = 0; j < n+1; j++){
-        
-        for(int i = 0; i < m-1; i++){
-            u[i+1] = (1-beta*beta)*u0[i+1] - 0.5*beta*(1-beta)*u0[i+2] + (0.5*beta)*(1+beta)*u0[i];
-            u[0] = 0;
-            u[m-1] = 0;
-            u0[i] = u[i];
+    for (int i = 0; i < 101; i++){
+            outfile << u0[i] << " "; 
+    }
+    outfile << endl;
+
+    while (t < T_max){
+        for(int i = 1; i < 100; i++){
             
-            outfile << u[i] << " "; 
+            u1[i] = u0[i] - beta/4*(u0[i+1]*u0[i+1] - u0[i-1]*u0[i-1]) + (beta*beta/8)*( (u0[i+1] + u0[i])*(u0[i+1]*u0[i+1] - u0[i]*u0[i]) - (u0[i] + u0[i-1])*(u0[i]*u0[i] - u0[i-1]*u0[i-1]) );
+
+            
         }
+        for (int i = 0; i < 101; i++){
+            outfile << u1[i] << " "; 
+            u0[i] = u1[i];
+        }
+        t = t + dt;
+        outfile << endl;
     }
-    
-     
-  
+
     outfile.close();
     
 }
